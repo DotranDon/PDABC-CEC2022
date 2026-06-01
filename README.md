@@ -335,7 +335,21 @@ The main score summary reported in the manuscript is:
 | ZOCMAES          | 32727.5 | 32837.0 |     65564.5 |
 | Co-PPSO          | 27468.0 | 27420.5 |     54888.5 |
 
-These values are provided to help readers connect the repository with the manuscript tables.
+The Friedman average ranks reported in the manuscript are:
+
+| Rank | Algorithm        | Average rank |
+| ---: | ---------------- | -----------: |
+|    1 | PDABC            |     3.291667 |
+|    2 | EA4eigN100_10    |     3.666667 |
+|    3 | NL-SHADE-LBC     |     4.000000 |
+|    4 | S_LSHADE_DP      |     4.041667 |
+|    5 | ABC              |     4.937500 |
+|    6 | NL-SHADE-RSP-MID |     5.229167 |
+|    7 | NLSOMACLP        |     6.020833 |
+|    8 | Co-PPSO          |     6.666667 |
+|    9 | ZOCMAES          |     7.145833 |
+
+These score and rank values are provided to help readers connect the repository with the manuscript tables.
 
 ## Notes on reproducibility
 
