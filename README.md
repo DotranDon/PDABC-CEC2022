@@ -242,7 +242,7 @@ This script measures the CEC-style computational complexity quantities, includin
 Typical output may include:
 
 ```text
-PDABC_reduced2_CEC2022_Complexity_TR.csv
+PDABC_CEC2022_Complexity.csv
 ```
 ### 6. Convergence figure
 
@@ -308,6 +308,12 @@ CEC2022_All_Trial_Data.csv
 The statistical testing script `scripts/cec2022_statistical_tests.py` generates Wilcoxon, Friedman, and Holm post hoc result files in `results/`.
 
 The complexity script `scripts/pdabc_complexity_test.py` generates the PDABC computational complexity summary in `results/`.
+The convergence-figure script `scripts/make_fig_convergence.py` generates representative convergence curves for the selected CEC2022 functions at `D=20`. The script reads the required result files from the `results/` folder and generates two figure files:
+
+```text
+Figure1.pdf
+Figure1.png
+```
 
 External CEC2022 competition result files required for reproducing the full nine-algorithm comparison are not redistributed in this repository. If needed, they should be obtained from the official CEC2022 source and placed locally in `results/` only for running the score and statistical scripts.
 
