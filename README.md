@@ -4,7 +4,7 @@ This repository provides source code and supporting files for the manuscript:
 
 **“Probability-Dimension Artificial Bee Colony Algorithm for Engineering-Oriented Numerical Optimization”**
 
-The repository is intended to support reproducibility and reviewer inspection. It contains the author-developed implementation of the proposed Probability-Dimension Artificial Bee Colony (PDABC) algorithm, the canonical ABC baseline, and scripts/results related to the experiments performed by the authors.
+The repository is intended to support reproducibility and reviewer inspection. It contains the author-developed implementation of the proposed Probability-Dimension Artificial Bee Colony (PDABC) algorithm, the canonical ABC baseline, and supporting scripts used for score calculation, statistical testing, and computational complexity analysis.
 
 ## Overview
 
@@ -16,11 +16,11 @@ The proposed PDABC algorithm is a simple extension of the canonical Artificial B
 * modified employed, onlooker, and scout bee phases;
 * lightweight vector-based updating without covariance matrix estimation or expensive local search.
 
-The method is evaluated in the manuscript on the CEC2022 single-objective bound-constrained benchmark suite for dimensions (D=10) and (D=20).
+The method is evaluated in the manuscript on the CEC2022 single-objective bound-constrained benchmark suite for dimensions `D=10` and `D=20`.
 
-## Repository contents
+## Repository structure
 
-A suggested structure of this repository is:
+The repository uses a simple script-based structure. The `scripts/` folder contains standalone Python scripts for running PDABC, running the ABC baseline, computing CEC2022-style target-reaching scores, performing statistical tests, and measuring computational complexity.
 
 ```text
 PDABC-CEC2022/
@@ -29,27 +29,31 @@ PDABC-CEC2022/
 ├── LICENSE
 ├── requirements.txt
 │
-├── src/
-│   ├── pdabc.py
-│   ├── abc_baseline.py
-│   └── utils.py
-│
 ├── scripts/
-│   ├── run_pdabc.py
-│   ├── run_abc.py
-│   └── process_pdabc_abc_results.py
+│   ├── pdabc.py
+│   ├── abc.py
+│   ├── cec2022_target_reaching_score.py
+│   ├── cec2022_statistical_tests.py
+│   └── pdabc_complexity_test.py
 │
 ├── results/
-│   ├── pdabc_results_D10.csv
-│   ├── pdabc_results_D20.csv
-│   ├── abc_results_D10.csv
-│   └── abc_results_D20.csv
+│   ├── PDABC_1_10.txt
+│   ├── ...
+│   ├── PDABC_12_20.txt
+│   ├── ABC_1_10.txt
+│   ├── ...
+│   ├── ABC_12_20.txt
+│   ├── CEC2022_Overall_Summary_Report.csv
+│   ├── CEC2022_Function_Scores.csv
+│   ├── CEC2022_Pairwise_Scores.csv
+│   ├── CEC2022_All_Trial_Data.csv
+│   └── PDABC_reduced2_CEC2022_Complexity_TR.csv
 │
 └── external/
     └── README.md
 ```
 
-The exact file names may differ depending on the released version, but the repository is organized to separate author-developed code, generated results, and external benchmark files.
+No separate `src/` package is required because the main algorithm scripts are self-contained and can be executed directly.
 
 ## External CEC2022 files
 
@@ -61,7 +65,7 @@ Please obtain the official CEC2022 benchmark definitions, source files, and rela
 https://github.com/P-N-Suganthan/2022-SO-BO
 ```
 
-After downloading the required benchmark files, place them in the `external/` folder or another local path and update the paths in the scripts accordingly.
+After downloading the required benchmark files, place them in the `results/` folder.
 
 This repository only provides the author-developed PDABC/ABC implementation and supporting scripts. Any external CEC2022 files should be obtained from their original source.
 
@@ -75,34 +79,170 @@ Install the required packages with:
 pip install -r requirements.txt
 ```
 
-A minimal `requirements.txt` may include:
+A minimal `requirements.txt` should include:
 
 ```text
 numpy
-scipy
 pandas
+scipy
 matplotlib
+opfunu
 ```
 
-## Running PDABC
+## Scripts
+
+### 1. Run PDABC
+
+The proposed Probability-Dimension Artificial Bee Colony algorithm is implemented in:
+
+```text
+scripts/pdabc.py
+```
+
+Example commands:
+
+```bash
+python scripts/pdabc.py --D 10 --workers 8 
+python scripts/pdabc.py --D 20 --workers 8 
+
+The value of `--workers` can be adjusted according to the number of available CPU cores.
+
+The script generates output files such as:
+
+```text
+PDABC_1_10.txt, ..., PDABC_12_10.txt
+PDABC_1_20.txt, ..., PDABC_12_20.txt
+```
+
+Each output file is a `17 x 30` matrix:
+
+```text
+rows 0..15 : function error values at CEC2022 recording points
+row  16    : FEterm
+```
+
+### 2. Run the ABC baseline
+
+The canonical ABC baseline is implemented in:
+
+```text
+scripts/abc.py
+```
+
+Example commands:
+
+```bash
+python scripts/abc.py --D 10 --workers 8 
+python scripts/abc.py --D 20 --workers 8 
+```
+
+The script generates output files such as:
+
+```text
+ABC_1_10.txt, ..., ABC_12_10.txt
+ABC_1_20.txt, ..., ABC_12_20.txt
+```
+
+Each output file is a `17 x 30` matrix:
+
+```text
+rows 0..15 : function error values at CEC2022 recording points
+row  16    : FEterm
+```
+
+### 3. Compute CEC2022 target-reaching scores
+
+The CEC2022-style target-reaching score calculation is implemented in:
+
+```text
+scripts/cec2022_target_reaching_score.py
+```
+
+This script compares algorithm results according to the CEC2022 target-reaching rule:
+
+* if one trial reaches `EPS = 1e-8` and the other does not, the reached trial is better;
+* if both trials reach `EPS`, the trial with the smaller `FEterm` is better;
+* if neither trial reaches `EPS`, the trial with the smaller final error is better;
+* exact ties give `0.5` point to each algorithm.
 
 Example command:
 
 ```bash
-python scripts/run_pdabc.py --dimension 10 --runs 30 --maxfes 200000
-python scripts/run_pdabc.py --dimension 20 --runs 30 --maxfes 1000000
+python scripts/cec2022_target_reaching_score.py
 ```
 
-## Running the ABC baseline
+The script expects result files in the form:
+
+```text
+AlgorithmName_FunctionNo_D.txt
+```
+
+For example:
+
+```text
+PDABC_1_10.txt
+ABC_1_10.txt
+EA4eigN100_10_1_10.txt
+```
+
+The script produces:
+
+```text
+CEC2022_Overall_Summary_Report.csv
+CEC2022_Function_Scores.csv
+CEC2022_Pairwise_Scores.csv
+CEC2022_All_Trial_Data.csv
+```
+
+If external CEC2022 competition result files are needed for the full nine-algorithm comparison, they should be obtained from the official CEC2022 source and placed locally. They are not redistributed in this repository.
+
+### 4. Statistical tests
+
+Statistical analysis is implemented in:
+
+```text
+scripts/cec2022_statistical_tests.py
+```
+
+This script is used to compute Wilcoxon comparisons, Friedman ranks, and Holm post hoc analysis from the processed CEC2022 target-reaching trial data.
 
 Example command:
 
 ```bash
-python scripts/run_abc.py --dimension 10 --runs 30 --maxfes 200000
-python scripts/run_abc.py --dimension 20 --runs 30 --maxfes 1000000
+python scripts/cec2022_statistical_tests.py
 ```
 
-Please adjust the command-line options according to the actual script names and local benchmark paths.
+Typical output files may include:
+
+```text
+PDABC_TR_Wilcoxon_Summary.csv
+PDABC_TR_Friedman_Ranks.csv
+PDABC_TR_Holm_Posthoc.csv
+```
+
+The exact output file names may depend on the released script version.
+
+### 5. Computational complexity test
+
+The computational complexity measurement for PDABC is implemented in:
+
+```text
+scripts/pdabc_complexity_test.py
+```
+
+Example command:
+
+```bash
+python scripts/pdabc_complexity_test.py
+```
+
+This script measures the CEC-style computational complexity quantities, including `T0`, `T1`, repeated `T2` runs, mean `T2`, and the complexity indicator.
+
+Typical output may include:
+
+```text
+PDABC_reduced2_CEC2022_Complexity_TR.csv
+```
 
 ## Experimental settings
 
@@ -111,19 +251,19 @@ The main experimental settings used in the manuscript are:
 | Setting                                 |                                                   Value |
 | --------------------------------------- | ------------------------------------------------------: |
 | Benchmark suite                         | CEC2022 single-objective bound-constrained optimization |
-| Dimensions                              |                                          (D=10), (D=20) |
-| Number of functions                     |                                                      12 |
+| Dimensions                              |                                          `D=10`, `D=20` |
+| Number of benchmark functions           |                                                      12 |
 | Independent runs                        |                                                      30 |
-| Maximum function evaluations for (D=10) |                                                  200000 |
-| Maximum function evaluations for (D=20) |                                                 1000000 |
+| Maximum function evaluations for `D=10` |                                                  200000 |
+| Maximum function evaluations for `D=20` |                                                 1000000 |
 | Number of food sources for PDABC/ABC    |                                                      30 |
-| Scout limit                             |                                (0.5 \times SN \times D) |
+| Scout limit                             |                                          `0.5 * SN * D` |
 
 ## Result files
 
-The `results/` folder contains result files generated by the authors for PDABC and the canonical ABC baseline. These files may include final errors, target-reaching information, convergence records, or processed summaries used in the manuscript.
+The `results/` folder is used to store result files generated by the authors for PDABC and the canonical ABC baseline, as well as processed score, statistical, and complexity outputs.
 
-Processed result files derived from external CEC2022 competition data are not included unless they contain only author-generated summaries and do not redistribute original third-party result files.
+Processed result files derived from external CEC2022 competition data are not redistributed unless they contain only author-generated summaries and do not include original third-party result files.
 
 ## Main manuscript result
 
@@ -131,7 +271,7 @@ In the manuscript, PDABC was compared with the canonical ABC baseline and seven 
 
 The main score summary reported in the manuscript is:
 
-| Algorithm        |  (D=10) |  (D=20) | Total score |
+| Algorithm        |  `D=10` |  `D=20` | Total score |
 | ---------------- | ------: | ------: | ----------: |
 | PDABC            | 57613.5 | 58389.0 |    116002.5 |
 | NL-SHADE-LBC     | 59693.5 | 49009.5 |    108703.0 |
