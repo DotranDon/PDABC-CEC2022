@@ -104,6 +104,7 @@ Example commands:
 ```bash
 python scripts/pdabc.py --D 10 --workers 8 
 python scripts/pdabc.py --D 20 --workers 8 
+```
 
 The value of `--workers` can be adjusted according to the number of available CPU cores.
 
