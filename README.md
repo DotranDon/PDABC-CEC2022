@@ -36,21 +36,18 @@ PDABC-CEC2022/
 │   ├── cec2022_statistical_tests.py
 │   └── pdabc_complexity_test.py
 │
-├── results/
-│   ├── PDABC_1_10.txt
-│   ├── ...
-│   ├── PDABC_12_20.txt
-│   ├── ABC_1_10.txt
-│   ├── ...
-│   ├── ABC_12_20.txt
-│   ├── CEC2022_Overall_Summary_Report.csv
-│   ├── CEC2022_Function_Scores.csv
-│   ├── CEC2022_Pairwise_Scores.csv
-│   ├── CEC2022_All_Trial_Data.csv
-│   └── PDABC_reduced2_CEC2022_Complexity_TR.csv
-│
-└── external/
-    └── README.md
+└── results/
+    ├── PDABC_1_10.txt
+    ├── ...
+    ├── PDABC_12_20.txt
+    ├── ABC_1_10.txt
+    ├── ...
+    ├── ABC_12_20.txt
+    ├── CEC2022_Overall_Summary_Report.csv
+    ├── CEC2022_Function_Scores.csv
+    ├── CEC2022_Pairwise_Scores.csv
+    ├── CEC2022_All_Trial_Data.csv
+    └── PDABC_reduced2_CEC2022_Complexity_TR.csv
 ```
 
 No separate `src/` package is required because the main algorithm scripts are self-contained and can be executed directly.
